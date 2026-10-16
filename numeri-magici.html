@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Numeri Magici</title>
+<style>
+:root{--bg:#e8f5ff;--ink:#1d2742;--card:#fff;--line:#c9defa;--pri:#ff7a2f;--alt:#7c5cff;--good:#23a55a;--bad:#e5484d;--sun:#ffcf33;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a30;--ink:#f4f1e4;--card:#222b4a;--line:#3a4775;--good:#4fd488;--bad:#ff7b80}}
+:root[data-theme="dark"]{--bg:#141a30;--ink:#f4f1e4;--card:#222b4a;--line:#3a4775;--good:#4fd488;--bad:#ff7b80}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-rounded,"Trebuchet MS","Comic Sans MS",system-ui,sans-serif;font-size:19px;line-height:1.35}
+.top{display:flex;align-items:center;gap:12px;max-width:640px;margin:0 auto;padding:12px 16px}
+.top h1{margin:0;font-size:1.7rem;line-height:1}.top p{margin:2px 0 0;font-size:.9rem}
+.mascot{font-size:2.6rem}.top>div:nth-child(2){flex:1}
+.stars{background:var(--sun);color:#3a2a00;border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.2rem}
+main{max-width:640px;margin:0 auto;padding:0 16px 24px}
+h2{font-size:1.3rem;margin:18px 0 8px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:16px;text-align:center}
+.big{font-size:3.6rem;line-height:1.1}
+.btn{font:inherit;font-weight:800;color:#fff;background:var(--pri);border:0;border-radius:18px;padding:12px 18px;min-height:54px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.25);margin:6px 4px}
+.btn.alt{background:var(--alt)}.btn.ghost{background:var(--card);color:var(--ink);border:3px solid var(--line);box-shadow:none}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:4px solid var(--alt);outline-offset:3px}
+.play{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}.play .big{font-size:3rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.lv{font:inherit;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:20px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;min-height:116px}
+.lv:disabled{opacity:.5;cursor:not-allowed}.lv .e{font-size:2.2rem}.lv small{font-size:.8rem}
+.bar{display:flex;align-items:center;gap:10px;margin:8px 0 12px}
+.prog{flex:1;height:16px;background:var(--line);border-radius:99px;overflow:hidden}.prog i{display:block;height:100%;width:0;background:var(--good);transition:width .3s}
+.eq{font-size:2.6rem;font-weight:800;margin:6px 0 14px}.txt{font-size:1.2rem;margin:6px 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{font:inherit;font-size:1.7rem;font-weight:800;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:18px;min-height:68px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--alt)}.opt.good{background:var(--good);border-color:var(--good);color:#fff}.opt.bad{background:var(--bad);border-color:var(--bad);color:#fff;animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{min-height:2.8em;margin:12px 0 4px;font-weight:700}
+.pop{animation:pop .6s}@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+.hud{display:flex;justify-content:space-between;font-weight:800;margin:6px 0}
+#cv{display:block;width:100%;max-width:420px;margin:0 auto;border-radius:16px;background:#14213d;touch-action:none}
+.pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,58px);gap:6px;justify-content:center;margin:10px 0}
+.pad button{font-size:1.5rem;border:0;border-radius:14px;background:var(--alt);color:#fff;cursor:pointer;touch-action:manipulation}
+.pad .u{grid-column:2}.pad .l{grid-row:2;grid-column:1}.pad .d{grid-row:2;grid-column:2}.pad .r{grid-row:2;grid-column:3}
+#gend{margin-top:10px}
+.pw{position:relative}.pw .lv{width:100%;height:100%}.del{position:absolute;top:4px;right:4px;font:inherit;font-size:.8rem;border:0;border-radius:10px;background:var(--line);color:var(--ink);padding:4px 8px;cursor:pointer}
+#nn{font:inherit;font-size:1.2rem;width:100%;padding:12px;border:3px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);margin:6px 0 10px}
+@media (prefers-reduced-motion:reduce){.pop,.opt.bad{animation:none}.prog i{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><button class="btn ghost" id="who" aria-label="Cambia giocatore" style="margin:0;padding:6px 10px;min-height:44px;box-shadow:none"></button><div><h1>Numeri Magici</h1><p>Risolvi, vinci stelle, poi gioca!</p></div><div class="stars" id="stars" aria-label="Stelle da spendere">⭐ 0</div></header>
+<main>
+<section id="home">
+ <div class="card play"><div id="pl"></div><button class="btn alt" id="go">🎮 Gioca (3 ⭐)</button></div>
+ <div class="card play" style="margin-top:12px"><div class="big">⏱️</div><div><b>Sfida a tempo</b><br>60 secondi: 8 giuste = 1 ⭐<br>Record: <b id="rec">0</b></div><button class="btn" id="ch">Via!</button><button class="btn ghost" id="lb">🏆 Classifica</button></div>
+ <h2>Scegli un livello</h2><div class="grid" id="lv"></div>
+</section>
+<section id="quiz" hidden>
+ <div class="bar"><button class="btn ghost" id="back" aria-label="Torna alla home">🏠</button><div class="prog"><i id="pr"></i></div><b id="qn"></b></div>
+ <div class="card"><div class="big" id="qe"></div><div id="qt"></div><div class="opts" id="op"></div><div class="fb" id="fb" aria-live="polite"></div><button class="btn" id="nx" hidden>Avanti ➜</button></div>
+</section>
+<section id="res" class="card" hidden></section>
+<section id="prof" class="card" hidden><h2>Chi gioca?</h2><div class="grid" id="pg"></div><h2>Nuovo giocatore</h2><input id="nn" maxlength="12" placeholder="Scrivi il tuo nome" aria-label="Nome del giocatore"><div class="opts" id="av" style="grid-template-columns:repeat(4,1fr)"></div><button class="btn" id="mk">Crea giocatore ➜</button><h2>🏆 Classifica di famiglia</h2><div id="lbd"></div></section>
+<section id="game" hidden>
+ <div class="bar"><button class="btn ghost" id="gback" aria-label="Torna alla home">🏠</button><div class="hud" id="hud" style="flex:1"></div></div>
+ <canvas id="cv" aria-label="Labirinto del Pulcino Golosone"></canvas>
+ <div class="pad"><button class="u" data-d="U" aria-label="Su">▲</button><button class="l" data-d="L" aria-label="Sinistra">◀</button><button class="d" data-d="D" aria-label="Giù">▼</button><button class="r" data-d="R" aria-label="Destra">▶</button></div>
+ <div class="card" id="gend" hidden></div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s),R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,rnd=a=>a[R(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const KEY='numeri-magici-v2';let ALL={cur:-1,p:[]},S={stars:0,spent:0,done:{}},TM,CH=false;
+try{ALL=JSON.parse(localStorage.getItem(KEY))||ALL;if(ALL.p[ALL.cur])S=ALL.p[ALL.cur]}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ALL))}catch(e){}};
+const show=id=>{['home','quiz','res','game','prof'].forEach(s=>$('#'+s).hidden=s!==id);if(id!=='game'&&G)G.over=true;window.scrollTo(0,0)};
+const LV=[
+ {n:'Pulcini',e:'🐣',add:20,t:[2,5,10]},{n:'Coniglietti',e:'🐰',add:30,t:[2,3,5,10]},{n:'Gattini',e:'🐱',add:50,t:[2,3,4,5]},
+ {n:'Volpi',e:'🦊',add:100,t:[2,3,4,5,6]},{n:'Delfini',e:'🐬',add:100,t:[3,4,6,7]},{n:'Leoni',e:'🦁',add:200,t:[6,7,8]},
+ {n:'Draghi',e:'🐲',add:300,t:[6,7,8,9]},{n:'Unicorni',e:'🦄',add:500,t:[3,4,6,7,8,9]},{n:'Razzi',e:'🚀',add:1000,t:[2,3,4,5,6,7,8,9]},{n:'Campioni',e:'🏆',add:1000,t:[2,3,4,5,6,7,8,9,10]}];
+const NM=['Luca','Sofia','Marco','Giulia','Leo','Anna','Teo','Chiara'];
+const OB=[['figurine','🃏'],['caramelle','🍬'],['biglie','🔮'],['mele','🍎'],['matite','✏️'],['conchiglie','🐚']];
+const MS={ok:['Bravissimo! 🎉','Esatto! 🌟','Sei un campione! 💪','Che mente! 🧠','Evviva! 🥳'],no:['Quasi! Il prossimo è tuo 💪','Ci sei vicino! 🙂','Sbagliando si impara! 🌈']};
+
+/* ---------- Home ---------- */
+function home(){clearInterval(TM);CH=false;run++;
+ const av=S.stars-S.spent,f=Math.min(av,3),un=Math.max(0,...Object.keys(S.done).map(Number))+1;
+ $('#stars').textContent='⭐ '+av;
+ $('#pl').innerHTML=`<div class="big">🐥</div><b>Pulcino Golosone</b><div>${'⭐'.repeat(f)}${'☆'.repeat(3-f)}<br>${av>=3?'Pronto a giocare!':'Servono 3 stelle'}</div>`;
+ $('#go').disabled=av<3;$('#who').textContent=S.av+' '+S.name;$('#rec').textContent=S.best||0;
+ const L=$('#lv');L.innerHTML='';
+ LV.forEach((c,i)=>{const n=i+1,b=document.createElement('button');b.className='lv';b.disabled=n>un;
+  b.innerHTML=`<span class="e">${n>un?'🔒':c.e}</span><b>Livello ${n}</b><small>${c.n}</small><span>${S.done[n]?'⭐':'&nbsp;'}</span>`;
+  b.onclick=()=>startQ(n);L.append(b)});
+ show('home');
+}
+$('#go').onclick=()=>startGame();$('#back').onclick=home;$('#gback').onclick=home;
+
+/* ---------- Domande ---------- */
+function make(t,lv){
+ const c=LV[lv-1],M=c.add;let x,y,q,a,e='🧮',p=0;
+ if(t==='add'){x=R(2,M-2);y=R(1,M-x);q=`${x} + ${y} = ?`;a=x+y}
+ else if(t==='sub'){x=R(3,M);y=R(1,x-1);q=`${x} − ${y} = ?`;a=x-y}
+ else if(t==='mul'){x=rnd(c.t);y=R(1,10);a=x*y;q=Math.random()<.3?`${y} × ${x} = ?`:`${x} × ${y} = ?`}
+ else if(t==='miss'){const k=lv<3?R(0,1):R(0,2);
+  if(k===0){x=R(2,M-2);y=R(1,M-x);q=`${x} + ▢ = ${x+y}`;a=y}
+  else if(k===1){x=R(3,M);y=R(1,x-1);q=`${x} − ▢ = ${x-y}`;a=y}
+  else{x=rnd(c.t);y=R(2,10);q=`${x} × ▢ = ${x*y}`;a=y}}
+ else{p=1;const n=rnd(NM),[o,em]=rnd(OB);e=em;const k=R(0,4);
+  if(k===0){x=R(2,M-2);y=R(1,Math.min(M-x,M));a=x+y;q=`${n} ha ${x} ${o} e ne trova altre ${y}. Quante ne ha adesso?`}
+  else if(k===1){x=R(3,M);y=R(1,x-1);a=x-y;q=`${n} ha ${x} ${o} e ne regala ${y} a un amico. Quante gliene restano?`}
+  else if(k===2){x=rnd(c.t);y=R(2,10);a=x*y;q=`${n} mette ${x} ${o} in ogni scatola. Ha ${y} scatole. Quante ${o} ha in tutto?`}
+  else if(k===3){x=R(2,M-2);y=R(1,M-x);a=x+y;e='🏫';q=`In classe ci sono ${x} bambini e ${y} bambine. Quanti alunni ci sono in tutto?`}
+  else{x=rnd(c.t);y=R(2,10);a=x*y;q=`Ogni pacchetto contiene ${x} ${o}. Quante ${o} ci sono in ${y} pacchetti?`}}
+ const s=new Set([a]);for(const d of shuffle([1,-1,2,-2,10,-10,5,-5,3,-3])){if(s.size>=4)break;if(a+d>=0)s.add(a+d)}
+ return{q,a,e,p,o:shuffle([...s])};
+}
+let Q,qi,ok,streak,lvl,locked,run=0;
+function startQ(n){lvl=n;run++;Q=['add','sub','mul','prob','miss','mul','prob','sub'].map(t=>make(t,n));qi=0;ok=0;streak=0;show('quiz');ask()}
+function ask(){
+ const q=Q[qi];locked=false;
+ if(!CH){$('#qn').textContent=`${qi+1}/8`;$('#pr').style.width=(qi/8*100)+'%'}
+ $('#qe').textContent=q.e;$('#qt').className=q.p?'txt':'eq';$('#qt').textContent=q.q;
+ $('#fb').textContent='🦉 Scegli la risposta giusta!';$('#nx').hidden=true;
+ const op=$('#op');op.innerHTML='';
+ q.o.forEach(v=>{const b=document.createElement('button');b.className='opt';b.textContent=v;b.dataset.v=v;b.onclick=()=>choose(b,v);op.append(b)});
+}
+function choose(b,v){
+ if(locked)return;locked=true;const q=Q[qi],id=run;
+ document.querySelectorAll('#op button').forEach(x=>{x.disabled=true;if(+x.dataset.v===q.a)x.classList.add('good')});
+ if(v===q.a){ok++;streak++;$('#fb').textContent='🦉 '+(streak>=3?`Serie di ${streak}! 🔥`:rnd(MS.ok));setTimeout(()=>{if(id===run)next()},CH?500:1000)}
+ else{streak=0;b.classList.add('bad');$('#fb').textContent=`🦉 ${rnd(MS.no)} La risposta era ${q.a}.`;if(CH)setTimeout(()=>{if(id===run)next()},1300);else{$('#nx').hidden=false;$('#nx').focus()}}
+}
+$('#nx').onclick=()=>next();
+function next(){if(CH){Q=[makeR()];qi=0;ask();return}qi++;qi>=8?finish():ask()}
+function finish(){
+ const p=ok>=6;if(p){S.stars++;S.done[lvl]=1;save()}
+ const av=S.stars-S.spent,r=$('#res');
+ r.innerHTML=`<div class="big ${p?'pop':''}">${p?'🌟':'💪'}</div><h2>${p?'Livello superato!':'Ci sei quasi!'}</h2><p>Risposte giuste: <b>${ok}</b> su 8</p><p>${p?(ok===8?'Perfetto! Hai vinto una stella! +1 ⭐':'Hai vinto una stella! +1 ⭐'):'Servono almeno 6 risposte giuste. Riprova!'}</p><div></div>`;
+ const a=r.lastChild,add=(t,f,c='')=>{const b=document.createElement('button');b.className='btn '+c;b.textContent=t;b.onclick=f;a.append(b)};
+ if(av>=3)add('🎮 Gioca (3 ⭐)',startGame,'alt');
+ if(p&&lvl<LV.length)add('Livello '+(lvl+1)+' ➜',()=>startQ(lvl+1));
+ if(!p)add('Riprova 🔁',()=>startQ(lvl));
+ add('🏠 Home',home,'ghost');
+ $('#stars').textContent='⭐ '+av;show('res');
+}
+
+/* ---------- Sfida a tempo ---------- */
+let CL=1;const TY=['add','sub','mul','prob','miss','mul'],makeR=()=>make(rnd(TY),CL);
+function startC(){
+ CL=Math.max(1,...Object.keys(S.done).map(Number));run++;CH=true;ok=0;streak=0;Q=[makeR()];qi=0;show('quiz');ask();
+ const end=Date.now()+60000;clearInterval(TM);
+ TM=setInterval(()=>{const l=Math.max(0,end-Date.now());$('#pr').style.width=(l/600)+'%';$('#qn').textContent=`⏱️ ${Math.ceil(l/1000)}s ✅ ${ok}`;if(l<=0)finishC()},200);
+}
+function finishC(){
+ clearInterval(TM);run++;CH=false;locked=true;
+ const w=ok>=8,nb=ok>(S.best||0);if(nb)S.best=ok;if(w)S.stars++;save();
+ const r=$('#res');
+ r.innerHTML=`<div class="big ${w?'pop':''}">${w?'🏅':'⏱️'}</div><h2>Tempo scaduto!</h2><p>Risposte giuste: <b>${ok}</b>${nb?' — nuovo record! 🎉':''}</p><p>${w?'Hai vinto una stella! +1 ⭐':'Con 8 risposte giuste vinci una stella. Riprova!'}</p><div></div>`;
+ const a=r.lastChild,add=(t,f,c='')=>{const b=document.createElement('button');b.className='btn '+c;b.textContent=t;b.onclick=f;a.append(b)};
+ if(S.stars-S.spent>=3)add('🎮 Gioca (3 ⭐)',startGame,'alt');
+ add('Riprova ⏱️',startC);add('🏠 Home',home,'ghost');
+ $('#stars').textContent='⭐ '+(S.stars-S.spent);show('res');
+}
+$('#ch').onclick=startC;$('#lb').onclick=profiles;
+
+/* ---------- Profili ---------- */
+const AV=['🦊','🐼','🦁','🐸','🐙','🦄','🐯','🐵'];let pav=AV[0];
+function profiles(){
+ clearInterval(TM);CH=false;run++;
+ const g=$('#pg');g.innerHTML='';
+ ALL.p.forEach((p,i)=>{const b=document.createElement('button');b.className='lv';b.innerHTML=`<span class="e">${p.av}</span><b></b><small>⭐ ${p.stars-p.spent}</small>`;b.querySelector('b').textContent=p.name;b.onclick=()=>{ALL.cur=i;S=p;save();home()};const w=document.createElement('div');w.className='pw';const x=document.createElement('button');x.className='del';x.textContent='🗑';x.setAttribute('aria-label','Elimina '+p.name);x.onclick=()=>{if(x.dataset.arm){ALL.p.splice(i,1);if(ALL.cur===i){ALL.cur=-1;S={stars:0,spent:0,done:{}}}else if(ALL.cur>i)ALL.cur--;save();profiles()}else{x.dataset.arm=1;x.textContent='Sicuro?';setTimeout(()=>{if(x.isConnected){delete x.dataset.arm;x.textContent='🗑'}},3000)}};w.append(b,x);g.append(w)});
+ const av=$('#av');av.innerHTML='';
+ AV.forEach(e=>{const b=document.createElement('button');b.className='opt'+(e===pav?' good':'');b.textContent=e;b.onclick=()=>{pav=e;profiles()};av.append(b)});
+ const LB=[...ALL.p].sort((a,b)=>(b.best||0)-(a.best||0)||b.stars-a.stars),d=$('#lbd');d.innerHTML='';
+ if(!LB.length)d.textContent='Crea il primo giocatore!';
+ LB.forEach((p,i)=>{const r=document.createElement('div');r.style.cssText='display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;padding:8px 4px;border-bottom:2px solid var(--line);text-align:left';
+  const lv=Math.max(0,...Object.keys(p.done).map(Number));r.textContent=`${['🥇','🥈','🥉'][i]||(i+1)+'.'} ${p.av} ${p.name}`;
+  const s=document.createElement('span');s.textContent=`⏱️ ${p.best||0}  ⭐ ${p.stars}  🏁 liv. ${lv}`;r.append(s);d.append(r)});
+ show('prof');
+}
+$('#mk').onclick=()=>{const n=$('#nn').value.trim().slice(0,12);if(!n){$('#nn').focus();return}
+ const p={name:n,av:pav,stars:0,spent:0,done:{},best:0};ALL.p.push(p);ALL.cur=ALL.p.length-1;S=p;$('#nn').value='';save();home()};
+$('#who').onclick=profiles;
+
+/* ---------- Gioco: Pulcino Golosone ---------- */
+const MAP=["###############","#o...........o#","#.###.#.#.###.#","#.............#","#.#...#.#...#.#","#.#.#.....#.#.#","#.....#.#.....#","#.#.#.....#.#.#","#.#...#.#...#.#","#.............#","#.###.#.#.###.#","#o...........o#","###############"];
+const W=15,H=13,C=28,D=[[1,0],[-1,0],[0,1],[0,-1]];let G=null,cx;
+const free=(x,y)=>G.grid[y]&&G.grid[y][x]&&G.grid[y][x]!=='#';
+function reset(ms){const n=performance.now();G.p={x:7,y:11,px:7,py:11,dx:0,dy:0,wx:0,wy:0};
+ G.gh.forEach(g=>{g.x=g.px=g.sx;g.y=g.py=g.sy;g.dx=g.dy=0});G.wait=n+ms;G.lp=G.lg=G.wait}
+function startGame(){
+ if(S.stars-S.spent<3)return;S.spent+=3;save();show('game');$('#gend').hidden=true;
+ const cv=$('#cv');cv.width=W*C;cv.height=H*C;cx=cv.getContext('2d');
+ const grid=MAP.map(r=>r.split(''));let dots=0;grid.forEach(r=>r.forEach(t=>{if(t==='.'||t==='o')dots++}));
+ G={grid,dots,score:0,lives:3,scared:0,over:false,gs:230,chase:.45,hud:'',gh:[[6,5],[8,5],[7,7]].map(([x,y])=>({sx:x,sy:y}))};
+ reset(1500);requestAnimationFrame(loop);
+}
+function stepP(){const p=G.p;p.px=p.x;p.py=p.y;
+ if((p.wx||p.wy)&&free(p.x+p.wx,p.y+p.wy)){p.dx=p.wx;p.dy=p.wy}
+ if(free(p.x+p.dx,p.y+p.dy)){p.x+=p.dx;p.y+=p.dy}else p.dx=p.dy=0;
+ const c=G.grid[p.y][p.x];
+ if(c==='.'||c==='o'){G.grid[p.y][p.x]=' ';G.dots--;G.score+=c==='o'?50:10;if(c==='o')G.scared=performance.now()+6000}
+ if(G.dots<=0)end(true);
+}
+function stepG(g){g.px=g.x;g.py=g.y;const p=G.p;
+ let o=D.filter(([a,b])=>free(g.x+a,g.y+b)&&!(a===-g.dx&&b===-g.dy));
+ if(!o.length)o=D.filter(([a,b])=>free(g.x+a,g.y+b));
+ const sc=performance.now()<G.scared,ds=v=>(g.x+v[0]-p.x)**2+(g.y+v[1]-p.y)**2;
+ const d=(!sc&&Math.random()<G.chase)?o.reduce((m,v)=>ds(v)<ds(m)?v:m):rnd(o);
+ g.dx=d[0];g.dy=d[1];g.x+=d[0];g.y+=d[1];
+}
+function hit(){const p=G.p,now=performance.now();
+ for(const g of G.gh){
+  if((g.x===p.x&&g.y===p.y)||(g.x===p.px&&g.y===p.py&&g.px===p.x&&g.py===p.y)){
+   if(now<G.scared){G.score+=100;g.x=g.px=g.sx;g.y=g.py=g.sy;g.dx=g.dy=0}
+   else{G.lives--;if(G.lives<=0)end(false);else reset(1200);return}}}
+}
+function loop(now){
+ if(!G||G.over)return;
+ if(now>=G.wait){
+  if(now-G.lp>=150){stepP();G.lp=now;if(G.over)return;hit()}
+  if(G&&!G.over&&now-G.lg>=G.gs){G.gh.forEach(stepG);G.lg=now;hit()}
+ }
+ if(!G||G.over)return;
+ draw(now);requestAnimationFrame(loop);
+}
+function em(ch,x,y,s){cx.font=`${C*s}px serif`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(ch,x*C,y*C+1)}
+function draw(now){
+ cx.fillStyle='#14213d';cx.fillRect(0,0,W*C,H*C);
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){const t=G.grid[y][x];
+  if(t==='#'){cx.fillStyle='#3a5bd9';cx.fillRect(x*C+2,y*C+2,C-4,C-4)}
+  else if(t==='.'){cx.fillStyle='#ffd166';cx.beginPath();cx.arc(x*C+C/2,y*C+C/2,3,0,7);cx.fill()}
+  else if(t==='o')em('🍓',x+.5,y+.5,.7)}
+ const pos=(e,l,st)=>{const t=Math.min(1,Math.max(0,(now-l)/st));return[e.px+(e.x-e.px)*t+.5,e.py+(e.y-e.py)*t+.5]};
+ const sc=now<G.scared;
+ G.gh.forEach(g=>{const[x,y]=pos(g,G.lg,G.gs);em(sc?'😱':'👻',x,y,.8)});
+ const[x,y]=pos(G.p,G.lp,150);em('🐥',x,y,.85);
+ const h=`Punti ${G.score}   ${'❤️'.repeat(G.lives)}${sc?'  🍓 Corri dietro ai fantasmi!':''}`;
+ if(h!==G.hud){G.hud=h;$('#hud').textContent=h}
+}
+function end(win){
+ G.over=true;const av=S.stars-S.spent,e=$('#gend');
+ e.innerHTML=`<div class="big">${win?'🏆':'🐥'}</div><h2>${win?'Hai mangiato tutto! Bravo!':'Partita finita!'}</h2><p>Punti: <b>${G.score}</b></p><div></div>`;
+ const a=e.lastChild,add=(t,f,c='')=>{const b=document.createElement('button');b.className='btn '+c;b.textContent=t;b.onclick=f;a.append(b)};
+ if(av>=3)add('🎮 Gioca ancora (3 ⭐)',startGame,'alt');
+ add('🧮 Torna agli esercizi',home);
+ e.hidden=false;
+}
+const setDir=(x,y)=>{if(G&&!G.over){G.p.wx=x;G.p.wy=y}};
+const KD={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+addEventListener('keydown',ev=>{const d=KD[ev.key];if(d&&!$('#game').hidden){ev.preventDefault();setDir(...d)}});
+document.querySelectorAll('.pad button').forEach(b=>{const m={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]}[b.dataset.d];b.onpointerdown=ev=>{ev.preventDefault();setDir(...m)}});
+let tx,ty;const cv=$('#cv');
+cv.addEventListener('touchstart',ev=>{tx=ev.touches[0].clientX;ty=ev.touches[0].clientY},{passive:true});
+cv.addEventListener('touchend',ev=>{const t=ev.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;
+ Math.abs(dx)>Math.abs(dy)?setDir(dx>0?1:-1,0):setDir(0,dy>0?1:-1)},{passive:true});
+ALL.p[ALL.cur]?home():profiles();
+</script>
+</body>
+</html>
